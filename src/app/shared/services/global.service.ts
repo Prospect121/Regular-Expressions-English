@@ -131,7 +131,6 @@ export class GlobalService {
      return (words.every(item => this.words.includes(item.replace(/\./g, ''))) && words.length > 0) ? '' : this.sentenceInvalid;
   }
 
-
   public success(){
     Swal.fire(
       'Good job!',
