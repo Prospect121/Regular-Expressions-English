@@ -1,0 +1,23 @@
+<div fxFlexFill fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px" style="position: absolute;">
+    <mat-card fxFlex="50">
+        <mat-card-title>
+            Affirmative sentences in present
+        </mat-card-title>
+        <mat-card-content fxLayout="column" fxLayoutAlign="center center" style="margin-top: 16px" fxLayoutGap="10px"> 
+            <div fxFlexFill fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+                <mat-form-field class="inputColor" fxFlex="50"> 
+                    <mat-label>Write your sentence </mat-label>
+                    <input matInput [formControl]="sentence" required>
+                    <mat-error *ngIf="sentence.invalid || sentence.hasError('pattern')">
+                        {{getErrorMessage("")}}
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+        <mat-card-footer>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" id="button" (click)="readText()">Validate</button>
+            </mat-card-actions>
+        </mat-card-footer>
+    </mat-card>
+</div>
