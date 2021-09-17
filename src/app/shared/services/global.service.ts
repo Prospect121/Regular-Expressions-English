@@ -128,7 +128,7 @@ export class GlobalService {
 
   public validComplement(words: string[], start: number): string {
     words = words.slice(start)
-     return (words.every(item => this.words.includes(item.replace(/\./g, ''))) && words.length > 0) ? '' : this.sentenceInvalid;
+     return (words.every(item => this.words.includes(item.replace(/[\.0-9:]/g, ''))) && words.length > 0) ? '' : this.sentenceInvalid;
   }
 
   public success(){
@@ -142,8 +142,16 @@ export class GlobalService {
   public error(){
     Swal.fire(
       'Error!',
-      'the sentence is invalid!',
+      'The sentence is invalid!',
       'error'
+    )
+  }
+
+  public info(){
+    Swal.fire(
+      'Info!',
+      'You must enter a value!',
+      'info'
     )
   }
 
