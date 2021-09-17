@@ -87,15 +87,18 @@ export class GlobalService {
 
   public validPersonalPronouns(words: Array<string> = [], word: string): string{
     let msj = '';
-    if(word === "I" && (words[1] != "AM" && !this.nounsSingular.includes(words[1]))) {
+    if(word === "I" && (words[1] != "AM" && 
+    (!this.nounsSingular.includes(words[1]) || this.validPersonalPronounsContraction(word, "M")))) {
       return this.sentenceInvalid;
     }
     if((word === "YOU" || word === "THEY" || word === "WE")
-    && (words[1] != "ARE"  && !this.nounsSingular.includes(words[1]))) {
+    && (words[1] != "ARE"  && 
+    (!this.nounsSingular.includes(words[1]) || this.validPersonalPronounsContraction(word, "RE")))) {
       return this.sentenceInvalid;
     }
     if((word === "HE" || word === "SHE" || word === "IT") 
-    && (words[1] != "IS" && !this.nounsPlurar.includes(words[1]))) {
+    && (words[1] != "IS" && 
+    (!this.nounsPlurar.includes(words[1]) || this.validPersonalPronounsContraction(word, "S")))) {
       return this.sentenceInvalid;
     }
     msj = this.validComplement(words, 2);
@@ -131,6 +134,12 @@ export class GlobalService {
      return (words.every(item => this.words.includes(item.replace(/[\.0-9:]/g, ''))) && words.length > 0) ? '' : this.sentenceInvalid;
   }
 
+  public validPersonalPronounsContraction(word: string, find: string): boolean{
+    word = word.replace(/'`/g, '');
+    let words = word.trim().split(" ");
+    return words[1] === find;
+  }
+
   public success(){
     Swal.fire(
       'Good job!',
@@ -147,10 +156,10 @@ export class GlobalService {
     )
   }
 
-  public info(){
+  public info(msj: string){
     Swal.fire(
       'Info!',
-      'You must enter a value!',
+      msj,
       'info'
     )
   }
