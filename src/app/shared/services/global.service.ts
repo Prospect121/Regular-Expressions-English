@@ -50,7 +50,7 @@ export class GlobalService {
     const mrAll = ["MR.","MRS.","MISS.","MS."]
     
     if(!isValid && this.personalPronouns.includes(words[index])){
-      msj = this.validPersonalPronouns(words, words[index]);
+      msj = this.validPersonalPronouns(words, words[index], index);
     } else if(this.demonstrativePronouns.includes(words[index])){
       msj = this.validDemonstrativePronouns (words, words[index])
     } else if(this.toBePresent.includes(words[index])){
@@ -60,7 +60,7 @@ export class GlobalService {
     } else if(this.nounsSingular.includes(words[index]) && !isValidThe){
       msj = this.sentenceInvalid;
     } else if(this.possiveNouns.includes(words[index])){
-      msj = this.sentenceInvalid;
+      msj = this.validPossiveNouns (words, index);
     } else if(words[index] === "THE" && !isValidThe) {
       msj = this.validPropersNouns(words,index+1, false, true);
     }  else if(mrAll.includes(words[index])) {
@@ -70,7 +70,8 @@ export class GlobalService {
         msj = this.validComplement(words, index+2);
       } else if (words[index+1] === "AND" && !isValid ){
         msj = this.validPropersNouns(words,index+2, true, true);
-      } else if(words[index+1] === "IS" && words[index-1] != "AND"){
+      } else if((words[index+1] === "IS" || this.validPersonalPronounsContraction(words[index], "S")) 
+      && words[index-1] != "AND"){
         msj = this.validComplement(words, index+2);
       } else if(words[index+1] === "ARE" && isValid){
         msj = this.validComplement(words, index+2);
@@ -85,23 +86,23 @@ export class GlobalService {
     return msj;
   }
 
-  public validPersonalPronouns(words: Array<string> = [], word: string): string{
+  public validPersonalPronouns(words: Array<string> = [], word: string, index: number): string{
     let msj = '';
-    if(word === "I" && (words[1] != "AM" && 
-    (!this.nounsSingular.includes(words[1]) || this.validPersonalPronounsContraction(word, "M")))) {
+    if(word === "I" && (words[index+1] != "AM" && 
+    (!this.nounsSingular.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "M")))) {
       return this.sentenceInvalid;
     }
     if((word === "YOU" || word === "THEY" || word === "WE")
-    && (words[1] != "ARE"  && 
-    (!this.nounsSingular.includes(words[1]) || this.validPersonalPronounsContraction(word, "RE")))) {
+    && (words[index+1] != "ARE"  && 
+    (!this.nounsSingular.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "RE")))) {
       return this.sentenceInvalid;
     }
     if((word === "HE" || word === "SHE" || word === "IT") 
-    && (words[1] != "IS" && 
-    (!this.nounsPlurar.includes(words[1]) || this.validPersonalPronounsContraction(word, "S")))) {
+    && (words[index+1] != "IS" && 
+    (!this.nounsPlurar.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "S")))) {
       return this.sentenceInvalid;
     }
-    msj = this.validComplement(words, 2);
+    msj = this.validComplement(words, index+2);
     return msj;
   }
 
@@ -129,13 +130,22 @@ export class GlobalService {
     return msj;
   }
 
+  public validPossiveNouns (words: Array<string> = [], index: number): string {
+    let msj = '';
+    if(!this.nounsPlurar.includes(words[index+1]) && !this.nounsSingular.includes(words[index+1])){
+      return this.sentenceInvalid;
+    }
+    msj = this.validComplement(words, index+2);
+    return msj;
+  }
+
   public validComplement(words: string[], start: number): string {
     words = words.slice(start)
      return (words.every(item => this.words.includes(item.replace(/[\.0-9:]/g, ''))) && words.length > 0) ? '' : this.sentenceInvalid;
   }
 
   public validPersonalPronounsContraction(word: string, find: string): boolean{
-    word = word.replace(/'`/g, '');
+    word = word.replace(/'|`/g, ' ');
     let words = word.trim().split(" ");
     return words[1] === find;
   }
