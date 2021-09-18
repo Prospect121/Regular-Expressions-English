@@ -55,7 +55,7 @@ export class GlobalService {
       msj = this.validDemonstrativePronouns (words, words[index])
     } else if(this.toBePresent.includes(words[index])){
       msj = this.sentenceInvalid;
-    } else if(this.nounsPlurar.includes(words[index])){
+    } else if(this.nounsPlurar.includes(words[index]) && !isValidThe){
       msj = this.sentenceInvalid;
     } else if(this.nounsSingular.includes(words[index]) && !isValidThe){
       msj = this.sentenceInvalid;
@@ -71,9 +71,11 @@ export class GlobalService {
       } else if (words[index+1] === "AND" && !isValid ){
         msj = this.validPropersNouns(words,index+2, true, true);
       } else if((words[index+1] === "IS" || this.validPersonalPronounsContraction(words[index], "S")) 
-      && words[index-1] != "AND"){
+      && words[index-1] != "AND" && !this.nounsPlurar.includes(words[index])){
         msj = this.validComplement(words, index+2);
-      } else if(words[index+1] === "ARE" && isValid){
+      } else if(words[index+1] === "ARE" && (words[index-1] != "AND" && this.nounsPlurar.includes(words[index])) ){
+        msj = this.validComplement(words, index+2);
+      }else if(words[index+1] === "ARE" && isValid){
         msj = this.validComplement(words, index+2);
       }else if(this.words.includes(words[index])){
         msj = this.sentenceInvalid;
@@ -97,8 +99,9 @@ export class GlobalService {
     (!this.nounsSingular.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "RE")))) {
       return this.sentenceInvalid;
     }
+    this.validPersonalPronounsContraction(word, "S")
     if((word === "HE" || word === "SHE" || word === "IT") 
-    && (words[index+1] != "IS" && 
+    && (words[index+1] != "IS" &&
     (!this.nounsPlurar.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "S")))) {
       return this.sentenceInvalid;
     }
@@ -146,8 +149,8 @@ export class GlobalService {
 
   public validPersonalPronounsContraction(word: string, find: string): boolean{
     word = word.replace(/'|`/g, ' ');
-    let words = word.trim().split(" ");
-    return words[1] === find;
+    let wordss = word.trim().split(" ");
+    return (wordss.length > 1) ? wordss[1] === find ?true:false :true;
   }
 
   public success(){
