@@ -70,7 +70,7 @@ export class GlobalService {
         msj = this.validComplement(words, index+2);
       } else if (words[index+1] === "AND" && !isValid ){
         msj = this.validPropersNouns(words,index+2, true, true);
-      } else if((words[index+1] === "IS" || this.validPersonalPronounsContraction(words[index], "S")) 
+      } else if((words[index+1] === "IS" || this.validPersonalPronounsContraction(words[index], "S", false)) 
       && words[index-1] != "AND" && !this.nounsPlurar.includes(words[index])){
         msj = this.validComplement(words, index+2);
       } else if(words[index+1] === "ARE" && (words[index-1] != "AND" && this.nounsPlurar.includes(words[index])) ){
@@ -91,18 +91,18 @@ export class GlobalService {
   public validPersonalPronouns(words: Array<string> = [], word: string, index: number): string{
     let msj = '';
     if(word === "I" && (words[index+1] != "AM" && 
-    (!this.nounsSingular.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "M")))) {
+    (!this.nounsSingular.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "M", true)))) {
       return this.sentenceInvalid;
     }
     if((word === "YOU" || word === "THEY" || word === "WE")
     && (words[index+1] != "ARE"  && 
-    (!this.nounsSingular.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "RE")))) {
+    (!this.nounsSingular.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "RE", true)))) {
       return this.sentenceInvalid;
     }
-    this.validPersonalPronounsContraction(word, "S")
+    this.validPersonalPronounsContraction(word, "S", false)
     if((word === "HE" || word === "SHE" || word === "IT") 
     && (words[index+1] != "IS" &&
-    (!this.nounsPlurar.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "S")))) {
+    (!this.nounsPlurar.includes(words[index+1]) || !this.validPersonalPronounsContraction(word, "S", true)))) {
       return this.sentenceInvalid;
     }
     msj = this.validComplement(words, index+2);
@@ -147,10 +147,13 @@ export class GlobalService {
      return (words.every(item => this.words.includes(item.replace(/[\.0-9:]/g, ''))) && words.length > 0) ? '' : this.sentenceInvalid;
   }
 
-  public validPersonalPronounsContraction(word: string, find: string): boolean{
+  public validPersonalPronounsContraction(word: string, find: string, pr: boolean): boolean{
     word = word.replace(/'|`/g, ' ');
     let wordss = word.trim().split(" ");
-    return (wordss.length > 1) ? wordss[1] === find ?true:false :true;
+    if(pr){
+      return true;
+    }
+    return wordss[1] === find
   }
 
   public success(){
